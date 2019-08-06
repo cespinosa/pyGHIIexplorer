@@ -133,7 +133,8 @@ def max_coord(ima, name, F_min=0.0):
     if F_min == 0.0:
         F_min = flux_min(ima, name)
 #    print("F_min="+str(F_min))
-    R = 10  # peak radius in pixels
+    sig = scale_based_on_redshift(redshift_input)
+    R = sig  # peak radius in pixels
     frac_peak = 0.15
     map_data_now = imacopy.data
     maxindex = map_data_now.argmax()
@@ -437,11 +438,10 @@ def HIIrecover_loop(ima, ima_err, name, plot=False, p=0, F_min=0):
     JPs = []
     chi2_basicfit, chi2_dualfit, chi2_gfit, chi2, parameter = 0, 0, 0, 0, 0
     alpha_list = []
+    sig = scale_based_on_redshift(redshift_input)
     for i in range(0, len(IP)):
         ip, jp = IP[i], JP[i]
-        subima = ima.subimage(center=(jp,ip), size=(l,l), unit_center=None, unit_size=None)
-        k = box_size(ima, subima)
-        k=15
+        k = 3*sig
         subima = ima.subimage(center=(jp,ip), size=(k,k), unit_center=None, unit_size=None)
         subima_err = ima_err.subimage(center=(jp,ip), size=(k,k), unit_center=None, unit_size=None)
         subima_err = error_ponderation(subima_err)
