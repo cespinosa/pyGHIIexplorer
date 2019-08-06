@@ -1,0 +1,3 @@
+setenv MUSE_DATA_PATH "/nfs/ofelia/disk-b/sanchez/MUSE/AMUSING/analysis/dataproducts_SSP/";
+setenv OUTPUT_TABLES_PATH "/nfs/ofelia/disk-b/sanchez/MUSE/AMUSING/analysis/HIIGaussian/";
+setenv OUTPUT_IMAGES_PATH "/nfs/ofelia/disk-b/sanchez/MUSE/AMUSING/analysis/HIIGaussian/";
