@@ -93,6 +93,12 @@ def gaussian_fit(x, y, sigma = 0.001):
     fit_residual = y - gaussian(x, *fit_params)
     fit_Rsquared = 1 - np.var(fit_residual)/np.var(y)
     return fit_params, fit_errors
+
+def scale_based_on_redshift(z):
+    scale_now=1000 * (1 / 0.2) * (1 / 1000) * (60)\
+        * 1 / (cosmo.kpc_proper_per_arcmin(z).value)
+    return scale_now
+
 def max_coord(F_min, map_data, readshift_input, galname):
     R = scale_based_on_redshift(readshift_input)
     frac_peak = 0.15
