@@ -27,6 +27,38 @@ def read_fits_slice(file_path, n_param, header=True):
     else:
         return map_slice
 
+def get_flux_min(Ha_map, plot=False):
+    map_data = Ha_map
+    mask_flux = map_data != 0
+    mask_neg_flux = map_data < 0
+    flux = map_data[mask_flux]
+    # flux_neg = map_data[mask_neg_flux]
+    # flux_neg_std = np.std(flux_neg)
+
+    values, bins = np.histogram(flux, 2000, density=True)
+    center_bins = [bins[i] + (bins[i+1]-bins[i])/2 \
+                   for i in np.arange(0, len(bins)-1)]
+    center_bins = np.array(center_bins)
+    fit_params, fit_errors = gaussian_fit(center_bins, values)
+    (mu, sigma) = (fit_params[1], fit_params[2])
+    if plot:
+        fig = Figure()
+        canvas = FigureCanvas(fig)
+        ax = fig.add_subplot()
+        n, bins, patches = ax.hist(flux, 2000, density=True, facecolor='green',
+                                   alpha=0.75)
+        # x_values = np.linspace(bins[0], bins[-1], 2000)
+        l = ax.plot(center_bins, n, 'r--', linewidth=2,
+                    label=r'$\mathrm{Gaussian\ fit:}\ \mu=%.5f,\ \sigma=%.5f$'\
+                    %(mu, sigma))
+        ax.scatter(center_bins, values)
+        ax.legend(loc='best')
+        ax.set_xlabel('Flux')
+        ax.set_ylabel('Number of pixels')
+        ax.set_xlim([-0.015, 0.03])
+        ax.set_ylim([0, 300])
+        canvas.print_figure("histogram_sigma_flux.png", format="png")
+    return np.abs(sigma)
 def main(args):
     fe_file = args.fe_file
     nHa = args.nHa
