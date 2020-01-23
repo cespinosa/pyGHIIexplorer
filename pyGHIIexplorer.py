@@ -6,7 +6,22 @@ __license__ = "BSD"
 
 import os
 import argparse
+import numpy as np
 from astropy.io import fits
+from scipy.optimize import curve_fit
+from astropy.cosmology import WMAP9 as cosmo
+
+# matplotlib
+import matplotlib
+matplotlib.use('Agg')
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+
+name_file_test = 'flux_elines.NGC5507.cube.fits.gz'
+path_test = '/home/espinosa/MUSE_DATA/flux_elines/' + name_file_test
+nHa = 20
+nHa_err = 140
+redshift= 0.006615
 
 def read_flux_elines_cubes(file_path, header=True):
     if header:
@@ -108,8 +123,11 @@ def max_coord(F_min, map_data, readshift_input, galname):
 def main(args):
     fe_file = args.fe_file
     nHa = args.nHa
-    print(fe_file)
-    print(nHa)
+    nHa_err = args.nHa_err
+    redshift = args.redshift
+    print('File: {} \n Ha emission map: {}'.format(fe_file, nHa), end='\t')
+    print('Ha emission error map: {}'.format(nHa_err))
+    # getting the Ha emission map
     try:
         Ha_map = read_fits_slice(fe_file, nHa, header=False)
     except FileNotFoundError as err:
@@ -119,7 +137,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog='pyGHIIexplorer', description='TBW')
 
     parser.add_argument("fe_file", help="Flux elines file", type=str)
-    parser.add_argument("nHa", help="Channel of Ha", type=int)
+    parser.add_argument("nHa", help="Channel of Ha map", type=int)
+    parser.add_argument("nHa_err", help="Channel of Ha error map", type=int)
+    parser.add_argument("redshift", help="Galaxy Redshift", type=float)
     parser.add_argument("--version", action="version",
                         version="%(prog)s"\
                         "(version {version})".format(version=__version__))
