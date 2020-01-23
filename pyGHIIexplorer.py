@@ -59,6 +59,25 @@ def get_flux_min(Ha_map, plot=False):
         ax.set_ylim([0, 300])
         canvas.print_figure("histogram_sigma_flux.png", format="png")
     return np.abs(sigma)
+    
+def gaussian(x, amp, xc, sigma):
+    return amp*np.exp( -(x-xc)**2 / (2*sigma**2)) / np.sqrt(2*np.pi*sigma**2)
+        
+def gaussian_fit(x, y, sigma = 0.001):
+    # define some initial guess values for the fit routine
+    # sigma = 0.001
+    amp = x.max()
+    xc = 0
+    guess_vals = [amp, xc, sigma]
+
+    # perform the fit and calculate fit parameter errors from covariance matrix
+    fit_params, cov_mat = curve_fit(gaussian, x, y, p0=guess_vals)
+    fit_errors = np.sqrt(np.diag(cov_mat))
+
+    # manually calculate R-squared goodness of fit
+    fit_residual = y - gaussian(x, *fit_params)
+    fit_Rsquared = 1 - np.var(fit_residual)/np.var(y)
+    return fit_params, fit_errors
 def main(args):
     fe_file = args.fe_file
     nHa = args.nHa
