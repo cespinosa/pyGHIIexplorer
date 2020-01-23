@@ -78,6 +78,33 @@ def gaussian_fit(x, y, sigma = 0.001):
     fit_residual = y - gaussian(x, *fit_params)
     fit_Rsquared = 1 - np.var(fit_residual)/np.var(y)
     return fit_params, fit_errors
+def max_coord(F_min, map_data, readshift_input, galname):
+    R = scale_based_on_redshift(readshift_input)
+    frac_peak = 0.15
+    map_data_now = map_data.copy()
+    maxindex = map_data_now.argmax()
+    fmax = np.amax(map_data_now)
+    (ny, nx) = map_data.shape
+    ip = -1
+    jp = -1
+    IP = np.array([])
+    JP = np.array([])
+    print(nx, ny)
+    print(maxindex)
+    print(R)
+    while fmax > F_min:
+        jp = maxindex // nx
+        ip = maxindex % nx
+        IP = np.append(IP, ip)
+        JP = np.append(JP, jp)
+        # making mask
+        x, y = np.meshgrid(np.arange(0, nx) - ip, np.arange(0, ny) - jp) 
+        ksel = (x/R)**2 + (y/R)**2
+        map_data_now *= (ksel > 1)
+        maxindex = map_data_now.argmax()
+        fmax = np.amax(map_data_now)
+    return IP, JP
+    
 def main(args):
     fe_file = args.fe_file
     nHa = args.nHa
